@@ -1,14 +1,13 @@
 // suggestion.ts
 import { VueRenderer } from '@tiptap/vue-3'
 import tippy from 'tippy.js'
-
-// import { TargetValueNode, DeadlineDateNode } from '../utils/tiptapNodes';
-
 import CommandsList from '@/components/CommandList.vue'
-// import ViewComponent from '@/components/ViewComponent.vue'
+
+import { type Item, type SuggestionProps, type StartEndProps } from '~/utils/types';
+
 
 const suggestion = {
-  items: ({ query }: { query: string }) => {
+  items: ({ query }: SuggestionProps): Item[] => {
     return [
       {
         title: 'Target Value',
@@ -17,8 +16,7 @@ const suggestion = {
             .chain()
             .focus()
             .deleteRange(range)
-            // .setNode('targetValue')
-            .insertContent('<span data-type="target-value"></span>')
+            .insertContent('<span data-type="target-value"></span> ')
             .run()
         },
       },
@@ -29,11 +27,11 @@ const suggestion = {
             .chain()
             .focus()
             .deleteRange(range)
-            .insertContent('<span data-type="deadline-node"></span>')
+            .insertContent('<span data-type="deadline-node"></span> ')
             .run()
         },
       },
-    ].filter(item => item.title.toLowerCase().startsWith(query.toLowerCase())).slice(0, 10)
+    ].filter(item => item.title.toLowerCase().includes(query.toLowerCase())).slice(0, 10)
   },
 
   render: () => {
@@ -41,7 +39,7 @@ const suggestion = {
     let popup: any
 
     return {
-      onStart: (props: any) => {
+      onStart: (props: StartEndProps) => {
         component = new VueRenderer(CommandsList, {
           props,
           editor: props.editor,
@@ -52,7 +50,7 @@ const suggestion = {
         }
 
         popup = tippy('body', {
-          getReferenceClientRect: props.clientRect,
+          getReferenceClientRect: () => props.clientRect()  || new DOMRect(),
           appendTo: () => document.body,
           content: component.element,
           showOnCreate: true,
@@ -62,9 +60,8 @@ const suggestion = {
         })
       },
 
-      onUpdate: (props: any) => {
+      onUpdate: (props: StartEndProps) => {
         component.updateProps(props)
-        console.log(props);
         if (!props.clientRect) {
           return
         }
@@ -74,13 +71,13 @@ const suggestion = {
         })
       },
 
-      onKeyDown: (props: any) => {
+      onKeyDown: (props: {event: KeyboardEvent}) => {
         if (props.event.key === 'Escape') {
           popup[0].hide()
 
           return true
         }
-        return component?.ref?.onKeyDown(props)
+        return component?.ref?.onKeyDown(props.event)
       },
 
       onExit: () => {

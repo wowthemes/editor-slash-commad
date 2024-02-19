@@ -1,28 +1,15 @@
-<template>
-  <div class="items">
-    <template v-if="items.length">
-      <button class="item" :class="{ 'is-selected': index === selectedIndex }" v-for="(item, index) in items" :key="index"
-        @click="selectItem(index)">
-        {{ item.title }}
-      </button>
-    </template>
-    <div class="item" v-else>
-      No result
-    </div>
-  </div>
-</template>
-
-<script setup>
+<!-- CommandList.vue -->
+<script setup lang="ts">
 import { ref, watch } from 'vue'
+import { type Item } from '../utils/types';
 
-const props = defineProps({
-  items: { type: Array, required: true },
-  command: { type: Function, required: true },
-})
-
+const props = defineProps<{
+  items: Item[];
+  command: (item: Item) => void;
+}>();
 const selectedIndex = ref(0)
 
-const onKeyDown = ({ event }) => {
+const onKeyDown = (event: KeyboardEvent) => {
   if (event.key === 'ArrowUp') {
     upHandler()
     return true
@@ -53,10 +40,8 @@ const enterHandler = () => {
   selectItem(selectedIndex.value)
 }
 
-const selectItem = (index) => {
+const selectItem = (index: number) => {
   const item = props.items[index]
-  console.log(item);
-
   if (item) {
     props.command(item)
   }
@@ -68,6 +53,20 @@ watch(() => props.items, () => {
 
 defineExpose({ onKeyDown })
 </script>
+
+<template>
+  <div class="items">
+    <template v-if="items.length">
+      <button class="item" :class="{ 'is-selected': index === selectedIndex }" v-for="(item, index) in items" :key="index"
+        @click="selectItem(index)">
+        {{ item.title }}
+      </button>
+    </template>
+    <div class="item" v-else>
+      No result
+    </div>
+  </div>
+</template>
 
 <style lang="scss">
 .items {
