@@ -4,7 +4,7 @@ export default defineNuxtConfig({
   ssr: false,
 
   app: {
-    //baseURL: '/sustainity-task/',
+    baseURL: '/editor-slash-command/',
     head: {
       script: []
     },

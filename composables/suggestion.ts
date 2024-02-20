@@ -5,9 +5,9 @@ import CommandsList from '@/components/CommandList.vue'
 
 import { type Item, type SuggestionProps, type StartEndProps } from '~/utils/types';
 
-
 const suggestion = {
   items: ({ query }: SuggestionProps): Item[] => {
+    const { hasPlaceholder } = useHelpers();
     return [
       {
         title: 'Target Value',
@@ -16,7 +16,7 @@ const suggestion = {
             .chain()
             .focus()
             .deleteRange(range)
-            .insertContent('<span data-type="target-value"></span> ')
+            .insertContent(hasPlaceholder('target-value') ? '' : '<span data-type="target-value"></span> ')
             .run()
         },
       },
@@ -27,7 +27,7 @@ const suggestion = {
             .chain()
             .focus()
             .deleteRange(range)
-            .insertContent('<span data-type="deadline-node"></span> ')
+            .insertContent(hasPlaceholder('deadline-node') ? '' : '<span data-type="deadline-node"></span> ')
             .run()
         },
       },
